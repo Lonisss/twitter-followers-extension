@@ -14,11 +14,11 @@ const App = () => {
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>URL:</p>
+    <div className="p-6">
+      <div>
+        <h1 className="text-5xl">URL:</h1>
         <p>{url}</p>
-      </header>
+      </div>
     </div>
   );
 };
