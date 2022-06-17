@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react"
 import {IMutual} from "./types";
 import {Mutual} from "./mutual";
+import {getUsernameFromUrl} from "./utils";
 
 function Mutuals() {
   const data: IMutual[] = [
@@ -18,23 +19,24 @@ function Mutuals() {
     },
   ]
 
-  const [url, setUrl] = useState<any>("")
+  const [url, setUrl] = useState("")
+  const [username, setUsername] = useState<any>("")
 
   useEffect(() => {
     const queryInfo = {active: true, lastFocusedWindow: true};
 
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       const chromeUrl = tabs[0].url;
-      setUrl(chromeUrl);
+      setUrl(chromeUrl ?? "");
     });
   }, []);
 
   useEffect(() => {
-    const twitter = "https://twitter.com/"
-    if (!url.startsWith(twitter)) return
-    const username = url.split(twitter).pop()
-    // api call
-
+    const twitterUsername = getUsernameFromUrl(url)
+    if (twitterUsername) {
+      setUsername(twitterUsername)
+      // api call
+    }
   }, [url])
   return (
     <div>
