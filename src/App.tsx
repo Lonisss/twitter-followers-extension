@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import {Mutuals} from "./mutuals";
+import {ExclamationCircleIcon} from "@heroicons/react/outline";
 
 const App = () => {
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    const queryInfo = { active: true, lastFocusedWindow: true };
-
-    chrome.tabs &&
-      chrome.tabs.query(queryInfo, (tabs) => {
-        const url = tabs[0].url;
-        setUrl(url ?? "");
-      });
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>URL:</p>
-        <p>{url}</p>
-      </header>
+    <div className="p-6">
+      <div className="flex justify-center space-x-0.5 mb-3">
+        <ExclamationCircleIcon className="w-4" strokeWidth={1.5} />
+        <p>
+          Make sure you are on <strong>https://twitter.com/</strong>
+        </p>
+      </div>
+      <div>
+        <Mutuals />
+      </div>
     </div>
   );
 };
