@@ -21,12 +21,21 @@ function Mutuals() {
   const [url, setUrl] = useState<any>("")
 
   useEffect(() => {
-    const queryInfo = { active: true, lastFocusedWindow: true };
-    const chromeUrl = chrome.tabs && chrome.tabs.query(queryInfo, (tabs) => {
-      return tabs[0].url
-    })
-    setUrl(chromeUrl)
-  }, [])
+    const queryInfo = {active: true, lastFocusedWindow: true};
+
+    chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
+      const chromeUrl = tabs[0].url;
+      setUrl(chromeUrl);
+    });
+  }, []);
+
+  useEffect(() => {
+    const twitter = "https://twitter.com/"
+    if (!url.startsWith(twitter)) return
+    const username = url.split(twitter).pop()
+    // api call
+
+  }, [url])
   return (
     <div>
       {data && (
@@ -38,7 +47,9 @@ function Mutuals() {
           })}
         </div>
       )}
-      {JSON.stringify(url)}
+      <p>
+        testing: {url}
+      </p>
     </div>
   )
 }
