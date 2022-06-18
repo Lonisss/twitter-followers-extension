@@ -3,8 +3,6 @@ import {Mutual} from "./mutual";
 import {getUsernameFromUrl} from "./utils";
 import {IMutual} from "./types";
 
-const baseUrl = "http://localhost:4000"
-
 function Mutuals() {
   const [data, setData] = useState<IMutual[] | []>([])
   const [url, setUrl] = useState("")
@@ -19,7 +17,7 @@ function Mutuals() {
       const chromeUrl = tabs[0].url;
       setUrl(chromeUrl ?? "");
     });
-    // setUrl("https://twitter.com/citydao")
+    setUrl("https://twitter.com/citydao")
   }, []);
 
   useEffect(() => {
@@ -31,7 +29,7 @@ function Mutuals() {
 
   useEffect(() => {
     async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<IMutual[]> {
-      const res = await fetch(`${baseUrl}/mutual/?target_username=${targetUsername}&page=${pageNumber}`)
+      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}`)
       if (!res.ok) {
         setStatus(`error ${res.status}`)
         return []
@@ -58,7 +56,7 @@ function Mutuals() {
         Current status: {status}
       </p>
       {data && (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 mb-3">
           {data.map(mutual => {
             return (
               <Mutual key={mutual.link} {...mutual} />
