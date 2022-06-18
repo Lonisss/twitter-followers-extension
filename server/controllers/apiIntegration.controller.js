@@ -1,5 +1,4 @@
 require("dotenv").config();
-const axios = require("axios");
 const { TwitterApi } = require("twitter-api-v2");
 
 const twitterClient = new TwitterApi(process.env.BEARER_TOKEN);
@@ -10,7 +9,7 @@ let targetNextPage = "";
 let mutuals = [];
 
 const getMutualFollowingsList = async (req, res) => {
-  const { target_username } = req.params;
+  const { target_username } = req.query
 
   const user = await roClient.v2.usersByUsernames("_Lonis_");
   const target = await roClient.v2.usersByUsernames(target_username);
