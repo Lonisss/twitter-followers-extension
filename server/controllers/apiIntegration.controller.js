@@ -19,12 +19,17 @@ function objectifyPerson(text) {
   }
 }
 
+function statusResponse(msg) {
+  return {
+    message: msg
+  }
+}
+
 async function getMutual(req, res) {
-  const username = req.query?.target_username
-  const page = req.query?.page || 1
+  const username = req?.query?.target_username
+  const page = req?.query?.page || 1
   if (!username) {
-    res.statusMessage = "Bad request: `target_username` is missing from query."
-    res.status(400).end()
+    res.status(400, statusResponse("Required query parameter `target_username` does not exist")).end()
   }
 
   const url = getTweepdiffUrl(username, page)
@@ -34,8 +39,7 @@ async function getMutual(req, res) {
 
   const results = $(".person_link")
   if (results.length === 0) {
-    res.statusMessage = "No mutual followers"
-    res.status(204).end()
+    res.status(204, statusResponse("No mutual followers")).end()
   }
 
   const response = []
