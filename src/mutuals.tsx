@@ -8,7 +8,7 @@ function Mutuals() {
   const [url, setUrl] = useState("")
   const [username, setUsername] = useState("")
   const [page, setPage] = useState(1)
-  const [status, setStatus] = useState("loading")
+  const [status, setStatus] = useState("idle")
 
   useEffect(() => {
     const queryInfo = {active: true, lastFocusedWindow: true};

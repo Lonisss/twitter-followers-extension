@@ -30,16 +30,25 @@ async function getMutual(req, res) {
   const page = req?.query?.page || 1
   if (!username) {
     res.status(400, statusResponse("Required query parameter `target_username` does not exist")).end()
+    return
   }
 
   const url = getTweepdiffUrl(username, page)
-  const {data} = await axios(url)
+  let data;
+  try {
+    const response = await axios(url)
+    data = response.data
+  } catch (e) {
+    res.status(500, statusResponse("Unable to do comparison")).end()
+    return
+  }
 
   const $ = cheerio.load(data)
 
   const results = $(".person_link")
   if (results.length === 0) {
     res.status(204, statusResponse("No mutual followers")).end()
+    return
   }
 
   const response = []
@@ -48,7 +57,6 @@ async function getMutual(req, res) {
     response.push(objectifyPerson(personText))
   })
 
-  res.status(200)
   res.json(response).end()
 }
 
