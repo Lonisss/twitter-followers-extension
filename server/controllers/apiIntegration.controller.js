@@ -1,56 +1,63 @@
 require("dotenv").config();
-const { TwitterApi } = require("twitter-api-v2");
+const axios = require("axios")
+const cheerio = require("cheerio")
 
-const twitterClient = new TwitterApi(process.env.BEARER_TOKEN);
-const roClient = twitterClient.readOnly;
+function getTweepdiffUrl(username, page = 1) {
+  return `https://tweepdiff.com/_Lonis_.followers/${username}?p=${page}`
+}
 
-let userNextPage = "";
-let targetNextPage = "";
-let mutuals = [];
-
-const getMutualFollowingsList = async (req, res) => {
-  const { target_username } = req.query
-
-  const user = await roClient.v2.usersByUsernames("_Lonis_");
-  const target = await roClient.v2.usersByUsernames(target_username);
-
-  const userFollowers = userNextPage
-    ? await roClient.v2.followers(user.data[0].id, {
-        pagination_token: userNextPage,
-      })
-    : await roClient.v2.followers(user.data[0].id);
-
-  const targetFollowings = targetNextPage
-    ? await roClient.v2.following(target.data[0].id, {
-        pagination_token: targetNextPage,
-      })
-    : await roClient.v2.following(target.data[0].id);
-
-  userFollowers.data.forEach((userElement) => {
-    targetFollowings.data.forEach((targetElement) => {
-      if (userElement.id === targetElement.id) {
-        mutuals = [...mutuals, userElement];
-        console.log("match", userElement);
-      } else {
-        console.log("no match found");
-      }
-    });
-  });
-
-  if (userFollowers.meta.next_token || targetFollowings.meta.next_token) {
-    console.log("Still searching");
-    userNextPage = userFollowers.meta.next_token
-      ? userFollowers.meta.next_token
-      : "";
-    targetNextPage = targetFollowings.meta.next_token
-      ? targetFollowings.meta.next_token
-      : "";
-
-    getMutualFollowingsList(req, res);
-  } else {
-    console.log("finished! check results");
-
-    res.json(mutuals);
+function objectifyPerson(text) {
+  text = text.replace(/(\r\n|\n|\r)/gm, "")  // remove new line
+  const parts = text.split(" ")
+  const username = parts.pop().slice(1, -1)
+  const name = parts.join(" ")
+  const link = `https://twitter.com/${username}`
+  return {
+    username,
+    name,
+    link,
   }
-};
-module.exports = { getMutualFollowingsList };
+}
+
+function statusResponse(msg) {
+  return {
+    message: msg
+  }
+}
+
+async function getMutual(req, res) {
+  const username = req?.query?.target_username
+  const page = req?.query?.page || 1
+  if (!username) {
+    res.status(400, statusResponse("Required query parameter `target_username` does not exist")).end()
+    return
+  }
+
+  const url = getTweepdiffUrl(username, page)
+  let data;
+  try {
+    const response = await axios(url)
+    data = response.data
+  } catch (e) {
+    res.status(500, statusResponse("Unable to do comparison")).end()
+    return
+  }
+
+  const $ = cheerio.load(data)
+
+  const results = $(".person_link")
+  if (results.length === 0) {
+    res.status(204, statusResponse("No mutual followers")).end()
+    return
+  }
+
+  const response = []
+  results.each((i, person) => {
+    const personText = $(person).text()
+    response.push(objectifyPerson(personText))
+  })
+
+  res.json(response).end()
+}
+
+module.exports = {getMutual}
