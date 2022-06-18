@@ -5,7 +5,7 @@ const { env } = require("process");
 
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 
 app.get("/mutual", getMutual);
 
