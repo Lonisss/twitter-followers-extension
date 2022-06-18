@@ -51,10 +51,10 @@ function Mutuals() {
   }, [username, page])
   return (
     <div>
-      <p className="text-lg mb-4">
+      <p className="text-lg mb-2">
         Current URL: {url}
       </p>
-      <p className="text-lg mb-4">
+      <p className="text-lg mb-2">
         Current status: {status}
       </p>
       {data && (
@@ -66,16 +66,20 @@ function Mutuals() {
           })}
         </div>
       )}
-      <button
-        onClick={() => setPage(page + 1)}
-      >
-        Increment page
-      </button>
-      <button
-        onClick={() => setPage(page - 1)}
-      >
-        Decrement page
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          className="bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 rounded text-white px-6 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-indigo-600"
+          onClick={() => setPage(page + 1)}
+        >
+          Increment page
+        </button>
+        <button
+          className="bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 rounded text-white px-6 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-indigo-600"
+          onClick={() => setPage(page - 1)}
+        >
+          Decrement page
+        </button>
+      </div>
     </div>
   )
 }
