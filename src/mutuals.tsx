@@ -1,26 +1,16 @@
 import React, {useEffect, useState} from "react"
-import {IMutual} from "./types";
 import {Mutual} from "./mutual";
 import {getUsernameFromUrl} from "./utils";
+import {IMutual} from "./types";
+
+const baseUrl = "http://localhost:4000/"
+
 
 function Mutuals() {
-  const data: IMutual[] = [
-    {
-      username: "Alexander_",
-      link: "https://twitter.com/disclosetv",
-    },
-    {
-      username: "Lonis_",
-      link: "https://twitter.com/testing123",
-    },
-    {
-      username: "Hakim77",
-      link: "https://twitter.com/hakim77",
-    },
-  ]
-
+  const [data, setData] = useState<IMutual[] | []>([])
   const [url, setUrl] = useState("")
-  const [username, setUsername] = useState<any>("")
+  const [username, setUsername] = useState("")
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     const queryInfo = {active: true, lastFocusedWindow: true};
@@ -29,15 +19,31 @@ function Mutuals() {
       const chromeUrl = tabs[0].url;
       setUrl(chromeUrl ?? "");
     });
+    setUrl("https://twitter.com/citydao")
   }, []);
 
   useEffect(() => {
     const twitterUsername = getUsernameFromUrl(url)
     if (twitterUsername) {
       setUsername(twitterUsername)
-      // api call
     }
   }, [url])
+
+  useEffect(() => {
+    async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<IMutual[]> {
+      const res = await fetch(`${baseUrl}?target_username=${targetUsername}&page=${pageNumber}`)
+      if (!res.ok) {
+        return []
+      }
+      return await res.json()
+    }
+
+    if (username) {
+      fetchMutuals(username, page).then((resData) => {
+        setData(resData)
+      })
+    }
+  }, [username, page])
   return (
     <div>
       {data && (
@@ -52,6 +58,9 @@ function Mutuals() {
       <p>
         testing: {url}
       </p>
+      <button onClick={() => setPage(page + 1)}>
+        Increment page
+      </button>
     </div>
   )
 }
