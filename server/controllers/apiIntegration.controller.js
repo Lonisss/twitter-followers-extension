@@ -34,8 +34,8 @@ async function getMutual(req, res) {
 
   const results = $(".person_link")
   if (results.length === 0) {
-    res.status(204)
-    res.json().end()
+    res.statusMessage = "No mutual followers"
+    res.status(204).end()
   }
 
   const response = []
