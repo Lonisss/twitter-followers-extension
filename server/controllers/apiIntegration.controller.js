@@ -45,19 +45,28 @@ async function getMutual(req, res) {
 
   const $ = cheerio.load(data)
 
+  const common = $("td[valign=top] .current").text().replace(/\D/g,"")
+  if (!common) {
+    res.status(204, statusResponse("No mutual followers")).end()
+    return
+  }
+
   const results = $(".person_link")
   if (results.length === 0) {
     res.status(204, statusResponse("No mutual followers")).end()
     return
   }
 
-  const response = []
+  const mutuals = []
   results.each((i, person) => {
     const personText = $(person).text()
-    response.push(objectifyPerson(personText))
+    mutuals.push(objectifyPerson(personText))
   })
 
-  res.json(response).end()
+  res.json({
+    mutuals,
+    common,
+  }).end()
 }
 
 module.exports = {getMutual}

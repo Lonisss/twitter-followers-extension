@@ -1,11 +1,11 @@
 import React from "react"
-import {IMutual} from "./types";
+import {IMutual} from "../types";
 import {ExternalLinkIcon} from "@heroicons/react/outline";
 
 function Mutual({username, name, link}: IMutual) {
   return (
-    <a href={link} target="_blank">
-      <div className="flex w-full border-2 border-gray-500 p-2 hover:border-gray-200 transition-colors justify-between">
+    <a href={link} target="_blank" rel="noreferrer">
+      <div className="flex w-full border border-gray-500 p-2 hover:bg-gray-700 rounded-md transition-colors justify-between">
         <div>
           <h3 className="text-xl font-medium">
             {name} ({username})
