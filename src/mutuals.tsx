@@ -59,17 +59,17 @@ function Mutuals() {
           <strong>info:</strong> {message}
         </p>
       )}
-      {common && (
+      {common !== 0 && (
         <p className="text-lg mb-2">
           <strong>common:</strong> {common <= 10 || page * 10 > common ? (
-            <>
-              {common}/{common}
-            </>
-          ) : (
-            <>
-              {page * 10}/{common}
-            </>
-          )}
+          <>
+            {common}/{common}
+          </>
+        ) : (
+          <>
+            {page * 10}/{common}
+          </>
+        )}
         </p>
       )}
       {mutuals?.length > 0 && (
@@ -83,7 +83,14 @@ function Mutuals() {
           </div>
           {mutuals.length && (
             <div className="flex justify-center">
-              <Pagination total={~~(common/10) + 1} page={page} onChange={setPage} className="text-xl" />
+              <Pagination
+                total={~~(common/10) + 1}
+                page={page}
+                onChange={setPage}
+                classNames={{
+                  item: "text-white",
+                }}
+              />
             </div>
           )}
         </div>
