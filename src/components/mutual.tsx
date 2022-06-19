@@ -1,5 +1,5 @@
 import React from "react"
-import {IMutual} from "./types";
+import {IMutual} from "../types";
 import {ExternalLinkIcon} from "@heroicons/react/outline";
 
 function Mutual({username, name, link}: IMutual) {

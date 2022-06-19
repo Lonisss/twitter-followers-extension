@@ -1,47 +1,40 @@
 import React, {useEffect, useState} from "react"
-import {Mutual} from "./mutual";
+import {Mutual} from "./components/mutual";
 import {getUsernameFromUrl} from "./utils";
 import {IMutual} from "./types";
+import {useLocation} from "./hooks/use-location";
 
 function Mutuals() {
+  const url = useLocation()
+
   const [data, setData] = useState<IMutual[] | []>([])
-  const [url, setUrl] = useState("")
   const [username, setUsername] = useState("")
   const [page, setPage] = useState(1)
   const [status, setStatus] = useState("idle")
   const [message, setMessage] = useState("")
 
-  useEffect(() => {
-    const queryInfo = {active: true, lastFocusedWindow: true};
+  async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<IMutual[]> {
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}`)
+    if (!res.ok) {
+      setStatus(`error: ${res.status}`)
+      return []
+    }
+    const textResponse = await res.text()
+    if (!textResponse) {
+      setMessage("empty response: either the account is not supported or the accounts don't have any mutual followers")
+      return []
+    }
+    return await JSON.parse(textResponse)
+  }
 
-    chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
-      const chromeUrl = tabs[0].url;
-      setUrl(chromeUrl ?? "");
-    });
-  }, []);
-
   useEffect(() => {
-    const twitterUsername = getUsernameFromUrl(url)
+    const twitterUsername = getUsernameFromUrl(url ?? "")
     if (twitterUsername) {
       setUsername(twitterUsername)
     }
   }, [url])
 
   useEffect(() => {
-    async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<IMutual[]> {
-      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}`)
-      if (!res.ok) {
-        setStatus(`error: ${res.status}`)
-        return []
-      }
-      const textResponse = await res.text()
-      if (!textResponse) {
-        setMessage("empty response: either the account is not supported or the accounts don't have any mutual followers")
-        return []
-      }
-      return await JSON.parse(textResponse)
-    }
-
     if (username) {
       setStatus("loading")
       setMessage("")
