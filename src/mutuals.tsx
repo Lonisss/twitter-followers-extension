@@ -1,36 +1,36 @@
 import React, {useEffect, useState} from "react"
 import {Mutual} from "./components/mutual";
 import {getUsernameFromUrl} from "./utils";
-import {IMutual} from "./types";
+import {IMutual, MutualResponse} from "./types";
 import {useLocation} from "./hooks/use-location";
 import {Pagination} from "@mantine/core";
 
 function Mutuals() {
   const url = useLocation()
 
-  const [data, setData] = useState<IMutual[] | []>([])
+  const [mutuals, setMutuals] = useState<IMutual[] | []>([])
+  const [common, setCommon] = useState(0)
   const [username, setUsername] = useState("")
   const [page, setPage] = useState(1)
   const [status, setStatus] = useState("idle")
   const [message, setMessage] = useState("")
 
-  async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<IMutual[]> {
+  async function fetchMutuals(targetUsername: string, pageNumber = 1): Promise<MutualResponse | null> {
     const res = await fetch(`${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}`)
     if (!res.ok) {
       setStatus(`rejected`)
-      return []
+      return null
     }
     const textResponse = await res.text()
     if (!textResponse) {
       setMessage("empty response: either the account is not supported or the accounts don't have any mutual followers")
-      return []
+      return null
     }
     return await JSON.parse(textResponse)
   }
 
   useEffect(() => {
     const twitterUsername = getUsernameFromUrl(url ?? "")
-    console.log(url)
     if (twitterUsername) {
       setUsername(twitterUsername)
     }
@@ -41,7 +41,8 @@ function Mutuals() {
       setStatus("loading")
       setMessage("")
       fetchMutuals(username, page).then(resData => {
-        setData(resData)
+        setMutuals(resData?.mutuals ?? [])
+        setCommon(resData?.common ?? 0)
         setStatus(`idle`)
       }).catch(err => {
         setStatus(`error: ${err}`)
@@ -58,18 +59,31 @@ function Mutuals() {
           <strong>info:</strong> {message}
         </p>
       )}
-      {data?.length > 0 && (
+      {common && (
+        <p className="text-lg mb-2">
+          <strong>common:</strong> {common <= 10 || page * 10 > common ? (
+            <>
+              {common}/{common}
+            </>
+          ) : (
+            <>
+              {page * 10}/{common}
+            </>
+          )}
+        </p>
+      )}
+      {mutuals?.length > 0 && (
         <div>
           <div className="grid grid-cols-1 gap-4 mb-3">
-            {data.map(mutual => {
+            {mutuals.map(mutual => {
               return (
                 <Mutual key={mutual.link} {...mutual} />
               )
             })}
           </div>
-          {data.length === 10 && (
+          {mutuals.length && (
             <div className="flex justify-center">
-              <Pagination total={3} page={page} onChange={setPage} className="text-xl" />
+              <Pagination total={~~(common/10) + 1} page={page} onChange={setPage} className="text-xl" />
             </div>
           )}
         </div>
