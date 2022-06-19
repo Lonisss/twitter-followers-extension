@@ -5,7 +5,7 @@ import {useLocation} from "../hooks/use-location";
 
 function TwitterWebsiteWarning() {
   const url = useLocation()
-  if (url === TwitterURL) {
+  if (url.startsWith(TwitterURL)) {
     return null
   }
 

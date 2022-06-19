@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {TwitterURL} from "../constants";
 
 function useLocation() {
   const [url, setUrl] = useState("")
@@ -11,7 +10,6 @@ function useLocation() {
       const chromeUrl = tabs[0].url;
       setUrl(chromeUrl ?? "")
     })
-    setUrl(TwitterURL + "citydao")
   }, [])
 
   return url
