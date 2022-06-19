@@ -1,9 +1,11 @@
 import React from "react"
 import {ExclamationCircleIcon} from "@heroicons/react/outline";
 import {TwitterURL} from "../constants";
+import {useLocation} from "../hooks/use-location";
 
-function TwitterWebsiteWarning({currentUrl}: {currentUrl: string}) {
-  if (currentUrl === TwitterURL) {
+function TwitterWebsiteWarning() {
+  const url = useLocation()
+  if (url === TwitterURL) {
     return null
   }
 
