@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 @layer base {
-    * {
-        @apply antialiased;
-    }
+  * {
+    @apply antialiased;
+  }
 
-    body {
-        @apply bg-gray-800 tracking-tight text-gray-50 w-[400px] h-[800px] transition-colors;
-    }
+  body {
+    @apply bg-gray-800 tracking-tight text-gray-50 w-[400px] h-[450px] transition-colors;
+  }
 }
