@@ -38,7 +38,6 @@ function Mutuals() {
   }
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_BASE_URL);
     const twitterUsername = getUsernameFromUrl(url ?? "");
     if (twitterUsername) {
       setUsername(twitterUsername);

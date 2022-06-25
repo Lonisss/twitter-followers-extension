@@ -7,7 +7,7 @@ function getTweepdiffUrl(username, page = 1) {
 }
 
 function objectifyPerson(text) {
-  text = text.replace(/(\r\n|\n|\r)/gm, "")  // remove new line
+  text = text.replace(/(\r\n|\n|\r)/gm, "")  // remove new line, aka "\n"
   const parts = text.split(" ")
   const username = parts.pop().slice(1, -1)
   const name = parts.join(" ")
