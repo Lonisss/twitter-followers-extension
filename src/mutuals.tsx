@@ -15,13 +15,17 @@ function Mutuals() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
+  const [originUserText, setOriginUserText] = useState("");
+  const [originUser, setOriginUser] = useState(
+    localStorage.getItem("ORIGIN_USERNAME")
+  );
 
   async function fetchMutuals(
     targetUsername: string,
     pageNumber = 1
   ): Promise<MutualResponse | null> {
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}`
+      `${process.env.REACT_APP_BASE_URL}/mutual/?target_username=${targetUsername}&page=${pageNumber}&origin_username=${originUser}`
     );
     if (!res.ok) {
       setStatus(`rejected`);
@@ -37,6 +41,11 @@ function Mutuals() {
     return await JSON.parse(textResponse);
   }
 
+  const registerNewUser = async (username: string) => {
+    await localStorage.setItem("ORIGIN_USERNAME", username);
+    setOriginUser(username);
+  };
+
   useEffect(() => {
     const twitterUsername = getUsernameFromUrl(url ?? "");
     if (twitterUsername) {
@@ -45,7 +54,7 @@ function Mutuals() {
   }, [url]);
 
   useEffect(() => {
-    if (username) {
+    if (username && originUser) {
       setStatus("loading");
       setMessage("");
       fetchMutuals(username, page)
@@ -58,7 +67,7 @@ function Mutuals() {
           setStatus(`error: ${err}`);
         });
     }
-  }, [username, page]);
+  }, [username, page, originUser]);
 
   useEffect(() => {
     if (status === "loading") {
@@ -66,7 +75,51 @@ function Mutuals() {
     }
   }, [status]);
 
-  return (
+  return !originUser ? (
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <input
+        placeholder="Enter your twitter username..."
+        onChange={(e) => {
+          setOriginUserText(e.target.value);
+        }}
+        value={originUserText}
+        style={{
+          color: "#000",
+          width: "80%",
+          height: "50px",
+          borderRadius: 10,
+          border: "none",
+          outline: "none",
+          marginBottom: "10px",
+          padding: "5px",
+          fontSize: 20,
+        }}
+      />
+      <button
+        onClick={() => {
+          registerNewUser(originUserText);
+        }}
+        style={{
+          width: "50%",
+          height: "40px",
+          color: "#1D1D1D",
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          fontSize: 20,
+        }}
+      >
+        Submit
+      </button>
+    </div>
+  ) : (
     <div>
       {status === "loading" && (
         <LoadingOverlay
