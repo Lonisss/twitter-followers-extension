@@ -29,12 +29,12 @@ async function getMutual(req, res) {
   const originUser = req?.query?.origin_username;
   const username = req?.query?.target_username;
   const page = req?.query?.page || 1;
-  if (!username) {
+  if (!username || !originUser) {
     res
       .status(
         400,
         statusResponse(
-          "Required query parameter `target_username` does not exist"
+          "Required query parameter `target_username` or `origin_username` does not exist"
         )
       )
       .end();
