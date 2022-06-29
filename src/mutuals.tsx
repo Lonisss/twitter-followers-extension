@@ -46,6 +46,12 @@ function Mutuals() {
     setOriginUser(username);
   };
 
+  const removeOriginUser = async () => {
+    await localStorage.removeItem("ORIGIN_USERNAME");
+    setOriginUser("");
+    setOriginUserText("");
+  };
+
   useEffect(() => {
     const twitterUsername = getUsernameFromUrl(url ?? "");
     if (twitterUsername) {
@@ -127,6 +133,24 @@ function Mutuals() {
           loaderProps={{ size: "xl", color: "#fff", height: "100%" }}
           overlayOpacity={0.3}
         />
+      )}
+
+      {status !== "loading" && (
+        <button
+          onClick={removeOriginUser}
+          style={{
+            width: "50%",
+            height: "40px",
+            color: "#1D1D1D",
+            backgroundColor: "#fff",
+            margin: 5,
+            border: "none",
+            borderRadius: 10,
+            fontSize: 20,
+          }}
+        >
+          Edit username
+        </button>
       )}
 
       {message && (
