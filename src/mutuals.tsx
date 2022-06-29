@@ -143,7 +143,7 @@ function Mutuals() {
             height: "40px",
             color: "#1D1D1D",
             backgroundColor: "#fff",
-            margin: 5,
+            marginLeft: 5,
             border: "none",
             borderRadius: 10,
             fontSize: 20,
