@@ -18,9 +18,5 @@
       "128": "logo192.png"
     }
   },
-  "content_scripts": {
-    "matches": ["<all_urls>"],
-    "run_at": "document_end"
-  },
   "permissions": ["activeTab"]
 }
