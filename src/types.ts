@@ -9,7 +9,4 @@ interface MutualResponse {
   common: number;
 }
 
-export type {
-  IMutual,
-  MutualResponse,
-}
+export type { IMutual, MutualResponse };
