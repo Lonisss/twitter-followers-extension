@@ -33,9 +33,7 @@ function Mutuals() {
     }
     const textResponse = await res.text();
     if (!textResponse) {
-      setMessage(
-        "empty response: either the account is not supported or the accounts don't have any mutual followers"
-      );
+      setMessage("empty response: there is no common users with this account");
       return null;
     }
     return await JSON.parse(textResponse);
