@@ -1,9 +1,46 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { IMutual } from "../types";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { openInNewTab } from "../utils";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function Mutual({ username, name, link }: IMutual) {
+  const imageRef: any = useRef();
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(
+    require("../assets/default-picture.jpg")
+  );
+  const observer = useMemo(
+    () =>
+      new IntersectionObserver(([entry]) =>
+        setIsIntersecting(entry.isIntersecting)
+      ),
+    []
+  );
+
+  const fetchProfilePicture = async () => {
+    const res = await fetch(`https://unavatar.io/twitter/${username}?json`);
+    const textResponse = await res.text();
+
+    return await JSON.parse(textResponse);
+  };
+
+  useEffect(() => {
+    if (isIntersecting) {
+      fetchProfilePicture().then((data) => {
+        setProfilePicture(data.url);
+      });
+    }
+  }, [isIntersecting]);
+
+  useEffect(() => {
+    observer.observe(imageRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [imageRef, observer]);
+
   return (
     <div
       onClick={() => openInNewTab(link)}
@@ -18,7 +55,8 @@ function Mutual({ username, name, link }: IMutual) {
           }}
         >
           <img
-            src={`https://unavatar.io/twitter/${username}`}
+            ref={imageRef}
+            src={profilePicture}
             style={{
               borderRadius: "100%",
               margin: 5,
