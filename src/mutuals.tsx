@@ -17,7 +17,7 @@ function Mutuals() {
   const [message, setMessage] = useState("");
   const [originUserText, setOriginUserText] = useState("");
   const [originUser, setOriginUser] = useState(
-    localStorage.getItem("ORIGIN_USERNAME")
+    localStorage.getItem(process.env.ORIGIN_USER_KEY || "")
   );
 
   async function fetchMutuals(
@@ -40,12 +40,12 @@ function Mutuals() {
   }
 
   const registerNewUser = async (username: string) => {
-    await localStorage.setItem("ORIGIN_USERNAME", username);
+    await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
     setOriginUser(username);
   };
 
   const removeOriginUser = async () => {
-    await localStorage.removeItem("ORIGIN_USERNAME");
+    await localStorage.removeItem(process.env.ORIGIN_USER_KEY || "");
     setOriginUser("");
     setOriginUserText("");
   };
