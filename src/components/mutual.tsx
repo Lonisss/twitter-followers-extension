@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import * as amplitude from "@amplitude/analytics-browser"
 import { IMutual } from "../types";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { openInNewTab } from "../utils";
@@ -25,6 +26,10 @@ function Mutual({ username, name, link }: IMutual) {
   };
 
   useEffect(() => {
+    amplitude.init("919bb5f506d083999fbdaf4f7acb0864")
+  }, [])
+
+  useEffect(() => {
     if (isIntersecting) {
       fetchProfilePicture().then((data) => {
         setProfilePicture(data.url);
@@ -40,9 +45,19 @@ function Mutual({ username, name, link }: IMutual) {
     };
   }, [imageRef, observer]);
 
+  const handleClick = () => {
+    void openInNewTab(link);
+
+    amplitude.track("mutual_click", {
+      username,
+      name,
+      link,
+    });
+  }
+
   return (
     <div
-      onClick={() => openInNewTab(link)}
+      onClick={handleClick}
       className="flex w-full border border-gray-500 p-2 hover:bg-gray-700 rounded-md transition-colors justify-between cursor-pointer select-none"
     >
       <div>
