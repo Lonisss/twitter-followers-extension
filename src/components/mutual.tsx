@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { IMutual } from "../types";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { openInNewTab } from "../utils";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function Mutual({ username, name, link }: IMutual) {
   const imageRef: any = useRef();
@@ -63,6 +62,7 @@ function Mutual({ username, name, link }: IMutual) {
               width: "40px",
               height: "40px",
             }}
+            alt=""
           />
           <h3 className="text-xl font-medium">
             {name} ({username})
