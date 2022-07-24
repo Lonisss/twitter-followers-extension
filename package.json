@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@amplitude/analytics-browser": "^1.0.3",
     "@heroicons/react": "^1.0.6",
     "@mantine/core": "^4.2.10",
     "@mantine/hooks": "^4.2.10",
@@ -28,7 +29,7 @@
   },
   "scripts": {
     "dev": "react-scripts start",
-    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && node buildPackage.js"
+    "build": "react-scripts build"
   },
   "eslintConfig": {
     "extends": [

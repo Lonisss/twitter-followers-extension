@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import * as amplitude from "@amplitude/analytics-browser"
 import { IMutual } from "../types";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { openInNewTab } from "../utils";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function Mutual({ username, name, link }: IMutual) {
   const imageRef: any = useRef();
@@ -41,9 +41,19 @@ function Mutual({ username, name, link }: IMutual) {
     };
   }, [imageRef, observer]);
 
+  const handleClick = () => {
+    void openInNewTab(link);
+
+    amplitude.track("mutual_click", {
+      username,
+      name,
+      link,
+    });
+  }
+
   return (
     <div
-      onClick={() => openInNewTab(link)}
+      onClick={handleClick}
       className="flex w-full border border-gray-500 p-2 hover:bg-gray-700 rounded-md transition-colors justify-between cursor-pointer select-none"
     >
       <div>
@@ -63,6 +73,7 @@ function Mutual({ username, name, link }: IMutual) {
               width: "40px",
               height: "40px",
             }}
+            alt=""
           />
           <h3 className="text-xl font-medium">
             {name} ({username})
