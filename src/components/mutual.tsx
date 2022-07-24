@@ -26,10 +26,6 @@ function Mutual({ username, name, link }: IMutual) {
   };
 
   useEffect(() => {
-    amplitude.init("919bb5f506d083999fbdaf4f7acb0864")
-  }, [])
-
-  useEffect(() => {
     if (isIntersecting) {
       fetchProfilePicture().then((data) => {
         setProfilePicture(data.url);

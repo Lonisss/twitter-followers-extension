@@ -5,6 +5,7 @@ import { IMutual, MutualResponse } from "./types";
 import { useLocation } from "./hooks/use-location";
 import { Pagination } from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
+import * as amplitude from "@amplitude/analytics-browser";
 
 function Mutuals() {
   const url = useLocation();
@@ -42,6 +43,9 @@ function Mutuals() {
   const registerNewUser = async (username: string) => {
     await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
     setOriginUser(username);
+    amplitude.track("origin_user_set", {
+      username,
+    })
   };
 
   const removeOriginUser = async () => {
@@ -55,6 +59,9 @@ function Mutuals() {
     if (twitterUsername) {
       setUsername(twitterUsername);
     }
+    amplitude.track("twitter_username_set", {
+      username: twitterUsername,
+    })
   }, [url]);
 
   useEffect(() => {
@@ -66,6 +73,9 @@ function Mutuals() {
           setMutuals(resData?.mutuals ?? []);
           setCommon(resData?.common ?? 0);
           setStatus(`idle`);
+          amplitude.track("mutuals_fetched", {
+            response: resData?.mutuals,
+          });
         })
         .catch((err) => {
           setStatus(`error: ${err}`);
