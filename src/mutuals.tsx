@@ -3,9 +3,10 @@ import { Mutual } from "./components/mutual";
 import { getUsernameFromUrl } from "./utils";
 import { IMutual, MutualResponse } from "./types";
 import { useLocation } from "./hooks/use-location";
-import { Pagination } from "@mantine/core";
+import {Button, Pagination, TextInput} from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
 import * as amplitude from "@amplitude/analytics-browser";
+import {AtSymbolIcon} from "@heroicons/react/outline";
 
 function Mutuals() {
   const url = useLocation();
@@ -99,39 +100,19 @@ function Mutuals() {
         alignItems: "center",
       }}
     >
-      <input
-        placeholder="Enter your twitter username..."
-        onChange={(e) => {
-          setOriginUserText(e.target.value);
-        }}
+      <TextInput
         value={originUserText}
-        style={{
-          color: "#000",
-          width: "80%",
-          height: "50px",
-          borderRadius: 10,
-          border: "none",
-          outline: "none",
-          marginBottom: "10px",
-          padding: "5px",
-          fontSize: 20,
-        }}
+        onChange={(e) => setOriginUserText(e.target.value)}
+        placeholder='Your twitter username'
+        icon={<AtSymbolIcon className='w-4' />}
       />
-      <button
-        onClick={() => {
-          registerNewUser(originUserText);
-        }}
-        style={{
-          width: "50%",
-          height: "40px",
-          color: "#1D1D1D",
-          backgroundColor: "#fff",
-          borderRadius: 10,
-          fontSize: 20,
-        }}
+      <Button
+        onClick={() => registerNewUser(originUserText)}
+        color='gray'
+        className='mt-2'
       >
         Submit
-      </button>
+      </Button>
     </div>
   ) : (
     <div>
@@ -144,21 +125,13 @@ function Mutuals() {
       )}
 
       {status !== "loading" && (
-        <button
+        <Button
+          variant="filled"
+          color="gray"
           onClick={removeOriginUser}
-          style={{
-            width: "50%",
-            height: "40px",
-            color: "#1D1D1D",
-            backgroundColor: "#fff",
-            marginLeft: 5,
-            border: "none",
-            borderRadius: 10,
-            fontSize: 20,
-          }}
         >
           Edit username
-        </button>
+        </Button>
       )}
 
       {message && (
@@ -188,17 +161,17 @@ function Mutuals() {
               return <Mutual key={mutual.link} {...mutual} />;
             })}
           </div>
-          {mutuals.length && (
-            <div className="flex justify-center">
-              <Pagination
-                total={~~(common / 10) + 1}
-                page={page}
-                onChange={setPage}
-                classNames={{
-                  item: "text-white",
-                }}
-              />
-            </div>
+          {mutuals.length && common > 10 && (
+            <Pagination
+              total={~~(common / 10) + 1}
+              page={page}
+              onChange={setPage}
+              position="center"
+              noWrap
+              classNames={{
+                item: "text-white",
+              }}
+            />
           )}
         </div>
       )}
