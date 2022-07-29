@@ -42,13 +42,14 @@ function Mutual({ username, name, link }: IMutual) {
   }, [imageRef, observer]);
 
   const handleClick = () => {
-    void openInNewTab(link);
-
-    amplitude.track("mutual_click", {
-      username: username ?? "",
-      name: name ?? "",
-      link: link ?? "",
-    });
+    if (link) {
+      void openInNewTab(link);
+      amplitude.track("mutual_click", {
+        username: username ?? "",
+        name: name ?? "",
+        link: link ?? "",
+      });
+    }
   }
 
   return (

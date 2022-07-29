@@ -44,9 +44,11 @@ function Mutuals() {
   const registerNewUser = async (username: string) => {
     await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
     setOriginUser(username);
-    amplitude.track("origin_user_set", {
-      username: username ?? "",
-    })
+    if (username) {
+      amplitude.track("origin_user_set", {
+        username: username ?? "",
+      })
+    }
   };
 
   const removeOriginUser = async () => {
@@ -59,10 +61,10 @@ function Mutuals() {
     const twitterUsername = getUsernameFromUrl(url ?? "");
     if (twitterUsername) {
       setUsername(twitterUsername);
+      amplitude.track("twitter_username_set", {
+        username: twitterUsername,
+      })
     }
-    amplitude.track("twitter_username_set", {
-      username: twitterUsername ?? "",
-    })
   }, [url]);
 
   useEffect(() => {
