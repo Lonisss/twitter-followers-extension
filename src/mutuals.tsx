@@ -3,10 +3,10 @@ import { Mutual } from "./components/mutual";
 import { getUsernameFromUrl } from "./utils";
 import { IMutual, MutualResponse } from "./types";
 import { useLocation } from "./hooks/use-location";
-import {Button, Pagination, TextInput} from "@mantine/core";
+import { Button, Pagination, TextInput } from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
 import * as amplitude from "@amplitude/analytics-browser";
-import {AtSymbolIcon} from "@heroicons/react/outline";
+import { AtSymbolIcon } from "@heroicons/react/outline";
 
 function Mutuals() {
   const url = useLocation();
@@ -47,7 +47,7 @@ function Mutuals() {
     if (username) {
       amplitude.track("origin_user_set", {
         username: username ?? "",
-      })
+      });
     }
   };
 
@@ -63,7 +63,7 @@ function Mutuals() {
       setUsername(twitterUsername);
       amplitude.track("twitter_username_set", {
         username: twitterUsername,
-      })
+      });
     }
   }, [url]);
 
@@ -105,13 +105,13 @@ function Mutuals() {
       <TextInput
         value={originUserText}
         onChange={(e) => setOriginUserText(e.target.value)}
-        placeholder='Your twitter username'
-        icon={<AtSymbolIcon className='w-4' />}
+        placeholder="Your twitter username"
+        icon={<AtSymbolIcon className="w-4" />}
       />
       <Button
         onClick={() => registerNewUser(originUserText)}
-        color='gray'
-        className='mt-2'
+        color="gray"
+        className="mt-2"
       >
         Submit
       </Button>
@@ -127,11 +127,7 @@ function Mutuals() {
       )}
 
       {status !== "loading" && (
-        <Button
-          variant="filled"
-          color="gray"
-          onClick={removeOriginUser}
-        >
+        <Button variant="filled" color="gray" onClick={removeOriginUser}>
           Edit username
         </Button>
       )}
@@ -160,6 +156,7 @@ function Mutuals() {
         <div>
           <div className="grid grid-cols-1 gap-4 mb-3">
             {mutuals.map((mutual) => {
+              console.log(mutual);
               return <Mutual key={mutual.link} {...mutual} />;
             })}
           </div>

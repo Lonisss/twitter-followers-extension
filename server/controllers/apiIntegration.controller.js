@@ -2,11 +2,42 @@ require("dotenv").config();
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+const emptyProfilePicture =
+  "https://www.pngkey.com/png/detail/282-2820067_taste-testing-at-baskin-robbins-empty-profile-picture.png";
+
 function getTweepdiffUrl(username, originUser, page = 1) {
   return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}`;
 }
 
-function objectifyPerson(text) {
+function getProfilePictureUrl(username, originUser, page = 1) {
+  return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}&s=1`;
+}
+
+const getProfilePictures = async (username, originUser, page, res) => {
+  const url = getProfilePictureUrl(username, originUser, page);
+  let data;
+  try {
+    const response = await axios(url);
+    data = response.data;
+  } catch (e) {
+    res.status(500, statusResponse("Unable to do comparison")).end();
+    return;
+  }
+  const $ = cheerio.load(data);
+  let profilePictures = [];
+
+  $(".person").map((i, el) => {
+    profilePictures.push(
+      $(el).children("img").attr("src")
+        ? $(el).children("img").attr("src")
+        : emptyProfilePicture
+    );
+  });
+
+  return profilePictures;
+};
+
+function objectifyPerson(text, profilePicture) {
   text = text.replace(/(\r\n|\n|\r)/gm, ""); // remove new line, aka "\n"
   const parts = text.split(" ");
   const username = parts.pop().slice(1, -1);
@@ -16,6 +47,7 @@ function objectifyPerson(text) {
     username,
     name,
     link,
+    profilePicture,
   };
 }
 
@@ -26,9 +58,9 @@ function statusResponse(msg) {
 }
 
 async function getMutual(req, res) {
-  const originUser = req?.query?.origin_username;
-  const username = req?.query?.target_username;
-  const page = req?.query?.page || 1;
+  const originUser = req.query.origin_username;
+  const username = req.query.target_username;
+  const page = req.query.page || 1;
   if (!username || !originUser) {
     res
       .status(
@@ -40,6 +72,13 @@ async function getMutual(req, res) {
       .end();
     return;
   }
+
+  const profilePictures = await getProfilePictures(
+    username,
+    originUser,
+    page,
+    res
+  );
 
   const url = getTweepdiffUrl(username, originUser, page);
   let data;
@@ -60,6 +99,7 @@ async function getMutual(req, res) {
   }
 
   const results = $(".person_link");
+
   if (results.length === 0) {
     res.status(204, statusResponse("No mutual followers")).end();
     return;
@@ -68,7 +108,7 @@ async function getMutual(req, res) {
   const mutuals = [];
   results.each((i, person) => {
     const personText = $(person).text();
-    mutuals.push(objectifyPerson(personText));
+    mutuals.push(objectifyPerson(personText, profilePictures[i]));
   });
 
   res
