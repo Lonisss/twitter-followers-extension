@@ -26,7 +26,7 @@ const getProfilePictures = async (username, originUser, page, res) => {
   const $ = cheerio.load(data);
 
   return $(".person").map((i, el) => {
-    return $(el).children("img").attr("src") ?? emptyProfilePicture;
+    return $(el).children("img").attr("src") || emptyProfilePicture;
   });
 };
 
