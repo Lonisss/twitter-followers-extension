@@ -24,17 +24,10 @@ const getProfilePictures = async (username, originUser, page, res) => {
     return;
   }
   const $ = cheerio.load(data);
-  let profilePictures = [];
 
-  $(".person").map((i, el) => {
-    profilePictures.push(
-      $(el).children("img").attr("src")
-        ? $(el).children("img").attr("src")
-        : emptyProfilePicture
-    );
+  return $(".person").map((i, el) => {
+    return $(el).children("img").attr("src") ?? emptyProfilePicture;
   });
-
-  return profilePictures;
 };
 
 function objectifyPerson(text, profilePicture) {
