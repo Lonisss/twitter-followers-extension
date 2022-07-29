@@ -45,7 +45,7 @@ function Mutuals() {
     await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
     setOriginUser(username);
     amplitude.track("origin_user_set", {
-      username,
+      username: username ?? "",
     })
   };
 
@@ -61,7 +61,7 @@ function Mutuals() {
       setUsername(twitterUsername);
     }
     amplitude.track("twitter_username_set", {
-      username: twitterUsername,
+      username: twitterUsername ?? "",
     })
   }, [url]);
 
@@ -75,7 +75,7 @@ function Mutuals() {
           setCommon(resData?.common ?? 0);
           setStatus(`idle`);
           amplitude.track("mutuals_fetched", {
-            response: resData?.mutuals,
+            response: resData?.mutuals ?? [],
           });
         })
         .catch((err) => {

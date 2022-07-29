@@ -45,9 +45,9 @@ function Mutual({ username, name, link }: IMutual) {
     void openInNewTab(link);
 
     amplitude.track("mutual_click", {
-      username,
-      name,
-      link,
+      username: username ?? "",
+      name: name ?? "",
+      link: link ?? "",
     });
   }
 
