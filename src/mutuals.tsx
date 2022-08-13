@@ -3,7 +3,7 @@ import { Mutual } from "./components/mutual";
 import { getUsernameFromUrl } from "./utils";
 import { IMutual, MutualResponse } from "./types";
 import { useLocation } from "./hooks/use-location";
-import { Button, Pagination, TextInput } from "@mantine/core";
+import { Button, Container, Image, Pagination, TextInput } from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
 import * as amplitude from "@amplitude/analytics-browser";
 import { AtSymbolIcon } from "@heroicons/react/outline";
@@ -126,31 +126,46 @@ function Mutuals() {
         />
       )}
 
-      {status !== "loading" && (
-        <Button variant="filled" color="gray" onClick={removeOriginUser}>
-          Edit username
-        </Button>
-      )}
+      <Container
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "25px",
+        }}
+      >
+        {message && (
+          <p className="text-lg mb-2">
+            <strong>info:</strong> {message}
+          </p>
+        )}
 
-      {message && (
-        <p className="text-lg mb-2">
-          <strong>info:</strong> {message}
-        </p>
-      )}
-      {common !== 0 && (
-        <p className="text-lg mb-2">
-          <strong>common:</strong>{" "}
-          {common <= 10 || page * 10 > common ? (
-            <>
-              {common}/{common}
-            </>
-          ) : (
-            <>
-              {page * 10}/{common}
-            </>
-          )}
-        </p>
-      )}
+        {common !== 0 && (
+          <p className="text-lg mb-2">
+            <strong>Golden Bridges:</strong>{" "}
+            {common <= 10 || page * 10 > common ? (
+              <>
+                {common}/{common}
+              </>
+            ) : (
+              <>
+                {page * 10}/{common}
+              </>
+            )}
+          </p>
+        )}
+
+        {status !== "loading" && common !== 0 && (
+          <Button onClick={removeOriginUser} color="gray">
+            <Image
+              src={require("./assets/edit-icon.png")}
+              width={"30px"}
+              height={"30px"}
+            />
+          </Button>
+        )}
+      </Container>
 
       {mutuals?.length > 0 && (
         <div>
