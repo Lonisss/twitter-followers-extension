@@ -6,6 +6,7 @@ const server = express();
 server.use(cors());
 const PORT = process.env.PORT || 4000;
 
+server.get("/test", (req, res) => res.json("Server up and running"));
 server.get("/mutual", getMutual);
 
 server.listen(PORT, () => {
