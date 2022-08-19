@@ -7,6 +7,7 @@ import { Button, Container, Image, Pagination, TextInput } from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
 import * as amplitude from "@amplitude/analytics-browser";
 import { AtSymbolIcon } from "@heroicons/react/outline";
+import { ChangeOriginUser } from "./components/ChangeOriginUser";
 
 function Mutuals() {
   const url = useLocation();
@@ -17,7 +18,6 @@ function Mutuals() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
-  const [originUserText, setOriginUserText] = useState("");
   const [originUser, setOriginUser] = useState(
     localStorage.getItem(process.env.ORIGIN_USER_KEY || "")
   );
@@ -42,6 +42,7 @@ function Mutuals() {
   }
 
   const registerNewUser = async (username: string) => {
+    await localStorage.removeItem(process.env.ORIGIN_USER_KEY || "");
     await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
     setOriginUser(username);
     if (username) {
@@ -51,10 +52,12 @@ function Mutuals() {
     }
   };
 
+  const cancelNewUser = async () => {
+    setOriginUser(localStorage.getItem(process.env.ORIGIN_USER_KEY || ""));
+  };
+
   const removeOriginUser = async () => {
-    await localStorage.removeItem(process.env.ORIGIN_USER_KEY || "");
     setOriginUser("");
-    setOriginUserText("");
   };
 
   useEffect(() => {
@@ -92,30 +95,17 @@ function Mutuals() {
     }
   }, [status]);
 
+  useEffect(() => {
+    setMutuals((previous) =>
+      previous.filter((mutual) => mutual.username !== username)
+    );
+  }, [mutuals]);
+
   return !originUser ? (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <TextInput
-        value={originUserText}
-        onChange={(e) => setOriginUserText(e.target.value)}
-        placeholder="Your twitter username"
-        icon={<AtSymbolIcon className="w-4" />}
-      />
-      <Button
-        onClick={() => registerNewUser(originUserText)}
-        color="gray"
-        className="mt-2"
-      >
-        Submit
-      </Button>
-    </div>
+    <ChangeOriginUser
+      registerNewUser={registerNewUser}
+      cancelNewUser={cancelNewUser}
+    />
   ) : (
     <div>
       {status === "loading" && (
@@ -160,8 +150,8 @@ function Mutuals() {
           <Button onClick={removeOriginUser} color="gray">
             <Image
               src={require("./assets/edit-icon.png")}
-              width={"30px"}
-              height={"30px"}
+              width={"15px"}
+              height={"15px"}
             />
           </Button>
         )}
