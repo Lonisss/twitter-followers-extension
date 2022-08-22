@@ -6,7 +6,6 @@ import { useLocation } from "./hooks/use-location";
 import { Button, Container, Image, Pagination, TextInput } from "@mantine/core";
 import { LoadingOverlay } from "@mantine/core";
 import * as amplitude from "@amplitude/analytics-browser";
-import { AtSymbolIcon } from "@heroicons/react/outline";
 import { ChangeOriginUser } from "./components/ChangeOriginUser";
 
 function Mutuals() {
@@ -19,7 +18,7 @@ function Mutuals() {
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
   const [originUser, setOriginUser] = useState(
-    localStorage.getItem(process.env.ORIGIN_USER_KEY || "")
+    localStorage.getItem("originUserKey")
   );
 
   async function fetchMutuals(
@@ -42,8 +41,8 @@ function Mutuals() {
   }
 
   const registerNewUser = async (username: string) => {
-    await localStorage.removeItem(process.env.ORIGIN_USER_KEY || "");
-    await localStorage.setItem(process.env.ORIGIN_USER_KEY || "", username);
+    localStorage.removeItem("originUserKey");
+    localStorage.setItem("originUserKey", username);
     setOriginUser(username);
     if (username) {
       amplitude.track("origin_user_set", {
@@ -53,7 +52,7 @@ function Mutuals() {
   };
 
   const cancelNewUser = async () => {
-    setOriginUser(localStorage.getItem(process.env.ORIGIN_USER_KEY || ""));
+    setOriginUser(localStorage.getItem("originUserKey"));
   };
 
   const removeOriginUser = async () => {
@@ -63,6 +62,9 @@ function Mutuals() {
   useEffect(() => {
     const twitterUsername = getUsernameFromUrl(url ?? "");
     if (twitterUsername) {
+      setPage(
+        Number(localStorage.getItem(`defaultPageKey${twitterUsername}`)) || 1
+      );
       setUsername(twitterUsername);
       amplitude.track("twitter_username_set", {
         username: twitterUsername,
@@ -75,14 +77,20 @@ function Mutuals() {
       setStatus("loading");
       setMessage("");
       fetchMutuals(username, page)
-        .then((resData) => {
+        .then(async (resData) => {
           console.log("res", resData);
           setMutuals(resData?.mutuals ?? []);
           setCommon(resData?.common ?? 0);
+          localStorage.setItem(`defaultPageKey${username}`, page.toString());
+
           setStatus(`idle`);
           amplitude.track("mutuals_fetched", {
             response: resData?.mutuals ?? [],
           });
+
+          setPage(
+            Number(localStorage.getItem(`defaultPageKey${username}`)) || 1
+          );
         })
         .catch((err) => {
           setStatus(`error: ${err}`);
@@ -160,7 +168,6 @@ function Mutuals() {
         <div>
           <div className="grid grid-cols-1 gap-4 mb-3">
             {mutuals.map((mutual) => {
-              console.log(mutual);
               return <Mutual key={mutual.link} {...mutual} />;
             })}
           </div>

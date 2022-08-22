@@ -35,7 +35,7 @@ export const ChangeOriginUser = ({
         Submit
       </Button>
 
-      {localStorage.getItem(process.env.ORIGIN_USER_KEY || "") && (
+      {localStorage.getItem("originUserKey") && (
         <Button onClick={cancelNewUser} color="gray" className="mt-2">
           Cancel
         </Button>
