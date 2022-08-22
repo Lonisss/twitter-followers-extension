@@ -13,7 +13,9 @@ function getProfilePictureUrl(username, originUser, page = 1) {
   return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}&s=1`;
 }
 
-const getProfilePictures = async (username, originUser, page, res) => {
+const getMutualsInformation = async (username, originUser, page, res) => {
+  let mutuals = [];
+
   const url = getProfilePictureUrl(username, originUser, page);
   let data;
   try {
@@ -25,24 +27,44 @@ const getProfilePictures = async (username, originUser, page, res) => {
   }
   const $ = cheerio.load(data);
 
-  return $(".person").map((i, el) => {
-    return $(el).children("img").attr("src") || emptyProfilePicture;
+  $(".person").map((i, el) => {
+    let name = $(el).children("img").attr("title") || "";
+    let mutualUsername = name
+      .match(/\((.*?)\)/g)
+      .map((b) => b.replace(/\(|(.*?)\)/g, "$1"));
+
+    mutuals.push({
+      name: name,
+      profilePicture: $(el).children("img").attr("src") || emptyProfilePicture,
+      link: `https://twitter.com/${
+        mutualUsername[mutualUsername.length > 1 ? 1 : 0]
+      }`,
+    });
   });
+
+  return mutuals || [];
 };
 
-function objectifyPerson(text, profilePicture) {
-  text = text.replace(/(\r\n|\n|\r)/gm, ""); // remove new line, aka "\n"
-  const parts = text.split(" ");
-  const username = parts.pop().slice(1, -1);
-  const name = parts.join(" ");
-  const link = `https://twitter.com/${username}`;
-  return {
-    username,
-    name,
-    link,
-    profilePicture,
-  };
-}
+const getCommonsNumber = async (username, originUser, page, res) => {
+  const url = getTweepdiffUrl(username, originUser, page);
+  let data;
+  try {
+    const response = await axios(url);
+    data = response.data;
+  } catch (e) {
+    res.status(500, statusResponse("Unable to do comparison")).end();
+    return;
+  }
+  const $ = cheerio.load(data);
+  const commonsNumber = $("td[valign=top] .current").text().replace(/\D/g, "");
+
+  if (!commonsNumber) {
+    res.status(204, statusResponse("No mutual followers")).end();
+    return;
+  }
+
+  return commonsNumber;
+};
 
 function statusResponse(msg) {
   return {
@@ -66,43 +88,10 @@ async function getMutual(req, res) {
     return;
   }
 
-  const profilePictures = await getProfilePictures(
-    username,
-    originUser,
-    page,
-    res
-  );
+  const common = await getCommonsNumber(username, originUser, page, res);
+  const mutuals = await getMutualsInformation(username, originUser, page, res);
 
-  const url = getTweepdiffUrl(username, originUser, page);
-  let data;
-  try {
-    const response = await axios(url);
-    data = response.data;
-  } catch (e) {
-    res.status(500, statusResponse("Unable to do comparison")).end();
-    return;
-  }
-
-  const $ = cheerio.load(data);
-
-  const common = $("td[valign=top] .current").text().replace(/\D/g, "");
-  if (!common) {
-    res.status(204, statusResponse("No mutual followers")).end();
-    return;
-  }
-
-  const results = $(".person_link");
-
-  if (results.length === 0) {
-    res.status(204, statusResponse("No mutual followers")).end();
-    return;
-  }
-
-  const mutuals = [];
-  results.each((i, person) => {
-    const personText = $(person).text();
-    mutuals.push(objectifyPerson(personText, profilePictures[i]));
-  });
+  console.log(mutuals);
 
   res
     .json({

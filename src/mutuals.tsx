@@ -76,6 +76,7 @@ function Mutuals() {
       setMessage("");
       fetchMutuals(username, page)
         .then((resData) => {
+          console.log("res", resData);
           setMutuals(resData?.mutuals ?? []);
           setCommon(resData?.common ?? 0);
           setStatus(`idle`);
@@ -96,9 +97,7 @@ function Mutuals() {
   }, [status]);
 
   useEffect(() => {
-    setMutuals((previous) =>
-      previous.filter((mutual) => mutual.username !== username)
-    );
+    setMutuals((previous) => previous.filter((mutual) => mutual.name));
   }, [mutuals]);
 
   return !originUser ? (

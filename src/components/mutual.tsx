@@ -4,7 +4,7 @@ import { IMutual } from "../types";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { openInNewTab } from "../utils";
 
-function Mutual({ username, name, link, profilePicture }: IMutual) {
+function Mutual({ name, link, profilePicture }: IMutual) {
   const imageRef: any = useRef();
   const [isIntersecting, setIsIntersecting] = useState(false);
 
@@ -12,7 +12,6 @@ function Mutual({ username, name, link, profilePicture }: IMutual) {
     if (link) {
       void openInNewTab(link);
       amplitude.track("mutual_click", {
-        username: username ?? "",
         name: name ?? "",
         link: link ?? "",
       });
@@ -43,9 +42,7 @@ function Mutual({ username, name, link, profilePicture }: IMutual) {
             }}
             alt=""
           />
-          <h3 className="text-xl font-medium">
-            {name} ({username})
-          </h3>
+          <h3 className="text-xl font-medium">{name}</h3>
         </div>
         <p className="text-lg text-gray-200">{link}</p>
       </div>

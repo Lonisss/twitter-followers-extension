@@ -1,5 +1,4 @@
 interface IMutual {
-  username: string;
   name: string;
   link: string;
   profilePicture: string;
