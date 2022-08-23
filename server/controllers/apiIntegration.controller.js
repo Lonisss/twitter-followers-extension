@@ -5,48 +5,14 @@ const cheerio = require("cheerio");
 const emptyProfilePicture =
   "https://www.pngkey.com/png/detail/282-2820067_taste-testing-at-baskin-robbins-empty-profile-picture.png";
 
-function getTweepdiffUrl(username, originUser, page = 1) {
-  return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}`;
-}
-
-function getProfilePictureUrl(username, originUser, page = 1) {
-  return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}&s=1`;
+function getMutualsUrl(username, originUser, page = 1) {
+  return `https://tweepdiff.com/${originUser}.followers/${username}?p=${page}&s=2`;
 }
 
 const getMutualsInformation = async (username, originUser, page, res) => {
   let mutuals = [];
 
-  const url = getProfilePictureUrl(username, originUser, page);
-  let data;
-  try {
-    const response = await axios(url);
-    data = response.data;
-  } catch (e) {
-    res.status(500, statusResponse("Unable to do comparison")).end();
-    return;
-  }
-  const $ = cheerio.load(data);
-
-  $(".person").map((i, el) => {
-    let name = $(el).children("img").attr("title") || "";
-    let mutualUsername = name
-      .match(/\((.*?)\)/g)
-      .map((b) => b.replace(/\(|(.*?)\)/g, "$1"));
-
-    mutuals.push({
-      name: name,
-      profilePicture: $(el).children("img").attr("src") || emptyProfilePicture,
-      link: `https://twitter.com/${
-        mutualUsername[mutualUsername.length > 1 ? 1 : 0]
-      }`,
-    });
-  });
-
-  return mutuals || [];
-};
-
-const getCommonsNumber = async (username, originUser, page, res) => {
-  const url = getTweepdiffUrl(username, originUser, page);
+  const url = getMutualsUrl(username, originUser, page);
   let data;
   try {
     const response = await axios(url);
@@ -57,13 +23,55 @@ const getCommonsNumber = async (username, originUser, page, res) => {
   }
   const $ = cheerio.load(data);
   const commonsNumber = $("td[valign=top] .current").text().replace(/\D/g, "");
+  $(".person").map((i, el) => {
+    let mutualProfilePicture = $(el)
+      .children(".details")
+      .children("h2")
+      .children("a")
+      .children("img")
+      .attr("src");
+
+    let mutualName =
+      $(el)
+        .children(".details")
+        .children("h2")
+        .children("a")
+        .children("span")
+        .text() || "";
+    let mutualFollowersNumber =
+      $(el)
+        .children(".details")
+        .children(".stats")
+        .children(".followers")
+        .children(".count")
+        .text() || 0;
+
+    let mutualUsername = mutualName
+      .match(/\((.*?)\)/g)
+      .map((b) => b.replace(/\(|(.*?)\)/g, "$1"));
+
+    mutuals.push({
+      name: mutualName,
+      profilePicture: mutualProfilePicture || emptyProfilePicture,
+      link: `https://twitter.com/${
+        mutualUsername[mutualUsername.length > 1 ? 1 : 0]
+      }`,
+      followersNumber: Number(mutualFollowersNumber),
+    });
+  });
 
   if (!commonsNumber) {
     res.status(204, statusResponse("No mutual followers")).end();
     return;
   }
 
-  return commonsNumber;
+  return {
+    mutuals:
+      mutuals.sort((a, b) => {
+        return b.followersNumber - a.followersNumber;
+      }) || [],
+    common: commonsNumber,
+  };
 };
 
 function statusResponse(msg) {
@@ -88,17 +96,12 @@ async function getMutual(req, res) {
     return;
   }
 
-  const common = await getCommonsNumber(username, originUser, page, res);
-  const mutuals = await getMutualsInformation(username, originUser, page, res);
-
-  console.log(mutuals);
-
-  res
-    .json({
-      mutuals,
-      common,
-    })
-    .end();
+  await getMutualsInformation(username, originUser, page, res).then(
+    (mutuals) => {
+      console.log(mutuals);
+      res.json(mutuals).end();
+    }
+  );
 }
 
 module.exports = { getMutual };
