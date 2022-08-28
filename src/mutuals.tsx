@@ -129,7 +129,7 @@ function Mutuals() {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: "25px",
+          marginBottom: "10px",
         }}
       >
         {message && (

@@ -50,6 +50,16 @@ const getMutualsInformation = async (username, originUser, page, res) => {
       .match(/\((.*?)\)/g)
       .map((b) => b.replace(/\(|(.*?)\)/g, "$1"));
 
+    if (!commonsNumber) {
+      res.status(204, statusResponse("No mutual followers")).end();
+      return;
+    }
+
+    if (mutualName.trim() === "()") {
+      console.log("false object");
+      return;
+    }
+
     mutuals.push({
       name: mutualName,
       profilePicture: mutualProfilePicture || emptyProfilePicture,
@@ -59,11 +69,6 @@ const getMutualsInformation = async (username, originUser, page, res) => {
       followersNumber: Number(mutualFollowersNumber),
     });
   });
-
-  if (!commonsNumber) {
-    res.status(204, statusResponse("No mutual followers")).end();
-    return;
-  }
 
   return {
     mutuals:
