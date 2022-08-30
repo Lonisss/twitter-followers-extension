@@ -154,7 +154,13 @@ function Mutuals() {
         )}
 
         {status !== "loading" && common !== 0 && (
-          <Button onClick={removeOriginUser} color="gray">
+          <Button
+            onClick={removeOriginUser}
+            color="gray"
+            style={{
+              marginTop: -7,
+            }}
+          >
             <Image
               src={require("./assets/edit-icon.png")}
               width={"15px"}
