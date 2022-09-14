@@ -88,9 +88,11 @@ function Mutuals() {
             response: resData?.mutuals ?? [],
           });
 
-          setPage(
-            Number(localStorage.getItem(`defaultPageKey${username}`)) || 1
-          );
+          if ((resData?.mutuals.length ?? []) > 0) {
+            setPage(
+              Number(localStorage.getItem(`defaultPageKey${username}`)) || 1
+            );
+          }
         })
         .catch((err) => {
           setStatus(`error: ${err}`);
