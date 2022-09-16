@@ -1,7 +1,7 @@
 {
   "name": "Twitter Intro Finder",
   "description": "Getting the perfect intro from followers of people that are also following you.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "manifest_version": 3,
   "icons": {
     "16": "logo192.png",

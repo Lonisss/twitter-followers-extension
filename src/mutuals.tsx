@@ -88,11 +88,9 @@ function Mutuals() {
             response: resData?.mutuals ?? [],
           });
 
-          if ((resData?.mutuals.length ?? []) > 0) {
-            setPage(
-              Number(localStorage.getItem(`defaultPageKey${username}`)) || 1
-            );
-          }
+          setPage(
+            Number(localStorage.getItem(`defaultPageKey${username}`)) || 1
+          );
         })
         .catch((err) => {
           setStatus(`error: ${err}`);
@@ -181,7 +179,7 @@ function Mutuals() {
           </div>
           {mutuals.length && common > 10 && (
             <Pagination
-              total={~~(common / 10) + 1}
+              total={common % 10 === 0 ? common / 10 : ~~(common / 10) + 1}
               page={page}
               onChange={setPage}
               position="center"
